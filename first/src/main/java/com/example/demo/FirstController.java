@@ -5,7 +5,11 @@ package com.example.demo;
  */
 public class FirstController {
 
+public String print(){
 
+
+    return "1";
+}
 public int sum(){
 
     return 1;
