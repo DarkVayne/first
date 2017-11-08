@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianfeng.dao.RoleDao">
+    <select id="findAllRoles2" resultType="com.qianfeng.beans.Role">
+    select * from role
+</select>
+    <select id="findAllRoles"  resultType="com.qianfeng.beans.Role">
+        SELECT * from role limit #{start},#{size}
+    </select>
+   <insert id="addRole" parameterType="com.qianfeng.beans.Role">
+       INSERT into role (name) VALUES (#{name})
+   </insert>
+    <delete id="deleteRole" parameterType="list" >
+        DELETE FROM role WHERE id IN
+        <foreach collection="list" item="x" open="(" separator="," close=")">
+           #{x}
+        </foreach>
+    </delete>
+<update id="updateRole" parameterType="com.qianfeng.beans.Role">
+       UPDATE role SET name=#{name} WHERE id=#{id}
+</update>
+    <insert id="fprole">
+INSERT into user_role (uid,rid)VALUES (#{uid},#{rid})
+    </insert>
+    <delete id="deleteId">
+        DELETE from user_role WHERE uid=#{uid}
+    </delete>
+    <delete id="deleteOldPerms">
+        delete from role_res where roleid=#{roleid}
+    </delete>
+    <insert id="toRolePerms" parameterType="map">
+        insert into role_res VALUES
+        <foreach collection="resid" item="x" separator=",">
+            (#{rid},#{x})
+        </foreach>
+    </insert>
+<select id="count" resultType="int">
+    select count(*) from role
+</select>
+</mapper>

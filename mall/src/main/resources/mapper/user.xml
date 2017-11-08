@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianfeng.dao.UserDao">
+    <select id="findAllAccount" resultType="com.qianfeng.beans.User">
+      select  u.id,u.account,u.pwd,r.name from users u left JOIN  user_role ur on u.id=ur.uid left join role r on ur.rid=r.id  limit #{start},#{size}
+   </select>
+   <insert id="addUser" parameterType="com.qianfeng.beans.User">
+    INSERT into users (account,pwd) VALUES (#{account},#{pwd})
+   </insert>
+    <delete id="deleteUser2" >
+        DELETE FROM users WHERE id=#{id}
+    </delete>
+    <delete id="deleteUser" parameterType="list" >
+        DELETE FROM users WHERE id IN
+        <foreach collection="list" item="x" open="(" separator="," close=")">
+           #{x}
+        </foreach>
+    </delete>
+<update id="updateUser" parameterType="com.qianfeng.beans.User">
+       UPDATE users SET account=#{account},pwd=#{pwd} WHERE id=#{id}
+</update>
+    <select id="count" resultType="int">
+        SELECT count(*)FROM users
+    </select>
+    <select id="login" resultType="com.qianfeng.beans.User">
+        
+        select * from users where account=#{account} AND pwd=#{pwd};
+    </select>
+</mapper>

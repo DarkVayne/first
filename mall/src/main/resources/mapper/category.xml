@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianfeng.dao.CategoryDao">
+    <select id="findAllCategory" resultType="com.qianfeng.beans.Category">
+        select * from category
+    </select>
+<insert id="addCategory" parameterType="com.qianfeng.beans.Category">
+    INSERT into category (categoryname , pid) VALUES( #{categoryname},#{pid})
+</insert>
+   <delete id="deleteCategory" parameterType="list">
+       DELETE FROM category WHERE id IN
+       <foreach collection="list" item="x" open="(" separator="," close=")">
+           #{x}
+       </foreach>
+   </delete>
+</mapper>

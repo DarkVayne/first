@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qianfeng.dao.CommodityDao">
+ <insert id="addCommodity" parameterType="com.qianfeng.beans.Commodity">
+     insert into commodity (sku,commname,price,liangdian,comcontent) values (#{sku},#{commname},#{price},#{liangdian},#{comcontent})
+ </insert>
+<insert id="addImage" parameterType="map">
+    insert into images (imagepath ,csku) values (#{imagepath} ,#{csku})
+</insert>
+    <select id="findAllCommodity" resultType="com.qianfeng.beans.Commodity">
+        select * from commodity
+    </select>
+    <select id="findComBysku" resultType="com.qianfeng.beans.Commodity">
+        select * from commodity where sku=#{sku}
+    </select>
+</mapper>

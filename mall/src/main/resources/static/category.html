@@ -1,0 +1,97 @@
+<div id="category_grid"></div>
+<div id="category_add_window" class="easyui-window" style="width: 500px;height: 500px;display: flex;justify-content: center;align-items: center;flex-flow: column" data-options="title:'添加商品',closed:true,modal:true">
+    <form id="Category_add_form" action="addCategory" class="form-group" method="get">
+        <div class="input-group" style="margin-bottom: 20px">
+            <span class="input-group-addon">商品名称</span>
+            <input type="text" name="categoryname" class="form-control" id="categoryname"/>
+        </div>
+        <div class="input-group" style="margin-bottom: 20px">
+            <span class="input-group-addon">添加类型</span>
+
+            <select class="form-control" id="pid" name="pid">
+                <option value="0">根目录</option>
+                <option value="1">手机</option>
+                <option value="5">空调</option>
+            </select>
+        </div>
+    </form>
+    <div>
+        <button class="btn btn-success btn-block" onclick="saveCategory()">确定</button>
+    </div>
+</div>
+<script>
+        function category_init() {
+            $("#category_grid").treegrid({
+                idField:"id",
+                treeField:"categoryname",
+                fitColumns:true,
+                singleSelect:false,
+//                method:"get",
+                columns:[[
+                    {field:"id",title:"id",checkbox:"true"},
+                    { field:"categoryname",title:"名字"}
+                ]],
+                toolbar:[  //定义工具栏
+                    {"text":"添加",iconCls:"icon-add",handler:function(){addCategory();}},//定义按钮
+                    {"text":"修改",iconCls:"icon-edit",handler:function(){editCategory();}},
+                    {"text":"删除",iconCls:"icon-remove",handler:function(){deleteCategory();}},
+                ]
+            });
+            categoryFillDate();
+        }
+    function categoryFillDate() {
+        $.get("findAllCategory",function (data) {
+            var x={rows:data};
+            var y=JSON.stringify(x);
+            var p=/pid/g;
+            var z=y.replace(p,"_parentId");
+            var b=/\"_parentId\":0/g;
+            var a=z.replace(b,"\"root\":0");
+            var c=JSON.parse(a);
+            $("#category_grid").treegrid("loadData",c);
+        });
+    }
+        $(category_init);
+    function addCategory() {
+        $("#Category_add_form").form("clear");
+
+        $("#category_add_window").window("open");
+    }
+    function saveCategory() {
+        var data = $("#categoryname").val();
+        alert(data)
+        if (data) {
+            $("#Category_add_form").form("submit",{
+                success: function (b) {
+                    if (b =="1") {
+                        alert("添加成功")
+                    } else {
+                        alert("添加失败")
+                    }
+                    $("#category_add_window").window("close");
+                    category_init();
+                }
+            });
+        } else{
+            $.messager.alert("系统提示","名字不能为空！")
+        }
+            }
+function deleteCategory() {
+    var data=$("#category_grid").treegrid("getSelections");
+    if(data.length>0){
+    if(confirm("确定要删除所选内容吗")){
+    var arr=[];
+    for (var i=0;i<data.length;i++){
+        arr[i]=data[i].id;
+    }
+    var json=JSON.stringify(arr);
+        $.ajax({url:"deleteCategory",method:"post",data:json,contentType:"application/json",
+        success:function (d) {
+            $(category_init);
+        }
+        })
+    }
+    }
+    }
+    </script>
+

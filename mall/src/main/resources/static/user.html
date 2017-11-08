@@ -1,0 +1,197 @@
+<div id="first"></div>
+<!--弹出窗口-->
+<div id="user_add_window" class="easyui-window"
+     style="width: 500px;height: 500px;display: flex;justify-content: center;align-items: center;flex-flow: column"
+     data-options="title:'添加用户',closed:true,modal:true">
+    <form id="user_add_form" action="updateUser" class="form-group">
+        <input type="hidden" name="id" id="userid"/>
+        <div class="input-group" style="margin-bottom: 20px">
+            <span class="input-group-addon">账号</span>
+            <input type="text" name="account" class="form-control" id="account"/>
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon">密码</span>
+            <input type="password" name="pwd" class="form-control" id="pwd"/>
+        </div>
+    </form>
+    <div>
+        <button class="btn btn-success btn-block" onclick="save()">保存</button>
+    </div>
+    <!--角色窗口-->
+    <div id="user_fenpei_window" class="easyui-window"
+         style="width: 500px;height: 500px;display: flex;justify-content: center;align-items: center;flex-flow: column"
+         data-options="title:'指定角色',closed:true,modal:true">
+        <div id="user_fenpei_grid" style="width:300px;height:100%"></div>
+        <div>
+            <button class="btn btn-success btn-block" onclick="saverole()">确定</button>
+        </div>
+    </div>
+    <script>
+        var total = 0;
+
+        //初始化
+        function init() {
+            $.ajax({
+                url: "total",
+                method: "get",
+                success: function (ddd) {
+                    total = JSON.parse(ddd);
+                }
+            });
+
+            //创建表格
+            $("#first").datagrid({
+
+                method: "get",      //请求的方式
+                pagination: true,
+                columns: [[
+                    {field: "id", title: "序号", checkbox: true},//指定列属性
+                    {field: "account", title: "账号", width: 100},//指定获取的数据key
+                    {field: "pwd", title: "密码", width: 100},
+                    {field: "name", title: "角色", width: 100}
+                ]],
+                toolbar: [  //定义工具栏
+                    {
+                        "text": "添加", iconCls: "icon-add", handler: function () {
+                        toAddUser();
+                    }
+                    },//定义按钮
+                    {
+                        "text": "修改", iconCls: "icon-edit", handler: function () {
+                        edit();
+                    }
+                    },
+                    {
+                        "text": "删除", iconCls: "icon-remove", handler: function () {
+                        deleteUser2();
+                    }
+                    },
+                    {
+                        "text": "分配权限", iconCls: "icon-search", handler: function () {
+                        fenpei();
+                    }
+                    }
+                ]
+            });
+            fillData(1, 3)
+        }
+        //实现分页：
+        function fillData(page, size) {
+            //异步获取数据并转换为json对象
+            $.getJSON("findAllAccount", {page: page, size: size}, function (data) {
+                $("#first").datagrid("loadData", data);
+                //处理分页
+                var pager = $("#first").datagrid("getPager");
+                pager.pagination({
+                    total: total,
+                    pageSize: size,
+                    pageNumber: page,
+                    pageList: [3, 5, 7],
+                    onSelectPage: function (p, s) {
+                        fillData(p, s);
+                    }
+                })
+            });
+        }
+        //调用init()
+        init();
+        function edit() {
+            var data = $("#first").datagrid("getSelected");
+            if (data) {
+                $("#user_add_form").form("load", {
+                    id: data.id,
+                    account: data.account,
+                    password: data.pwd
+                });
+                $("#user_add_window").window("open");
+            } else {
+                $.messager.alert("系统提示", "请选择要修改的内容！")
+            }
+        }
+
+        function toAddUser() {
+            //打开window
+            $("#user_add_form").form("clear");
+            $("#userid").val(0);
+            $("#user_add_window").window("open");
+
+        }
+        //保存
+        function save() {
+            //异步提交数据
+            var data1 = $("#account").val();
+            var data2 = $("#pwd").val();
+            if (data1 == null || data1 == "" || data2 == null || data2 == "") {
+                alert("账户和密码不能为空！")
+            } else {
+                $("#user_add_form").form("submit", {
+                    success: function (d) {
+                        if (d == "3") {
+                            alert("添加成功！")
+                        } else {
+                            alert("添加失败！")
+                        }
+                        $("#user_add_window").window("close");
+                        init();
+                    }
+                });
+            }
+        }
+        function deleteUser2() {
+            var data = $("#first").datagrid("getSelections");
+            if (data.length > 0) {
+                if (confirm("确定要删除所选内容吗？")) {
+                    var arr = [];
+                    for (var i = 0; i < data.length; i++) {
+                        arr[i] = data[i].id;
+                    }
+                    var json = JSON.stringify(arr);
+                    $.ajax({
+                        url: "deleteUser",
+                        method: "post",
+                        data: json,
+                        contentType: "application/json",
+                        success: function (d) {
+                            $("#first").datagrid("reload");
+
+                        }
+                    });
+                }
+            } else {
+                $.messager.alert("系统提示", "请选择要删除的内容！")
+            }
+        }
+        function deleteUser() {
+            var data = $("#first").datagrid("getSelected");
+            $.get("deleteUser", {id: data.id}, function (d) {
+                if (d == "3") {
+                    alert("删除成功！");
+                } else {
+                    alert("删除失败！");
+                }
+                $("#first").datagrid("reload");
+
+            });
+        }
+        //       指定角色
+        function fenpei() {
+            $("#user_fenpei_grid").datagrid({
+                url: "findAllRoles",
+                method: "get",
+                columns: [[
+                    {field: "id", checkbox: true, width: 100},
+                    {field: "name", title: "角色名称", width: 200}
+                ]]
+            });
+            $("#user_fenpei_window").window("open");
+
+        }
+        function saverole() {
+            var user = $("#first").datagrid("getSelected");
+            var role = $("#user_fenpei_grid").datagrid("getSelected");
+            $.get("saverole", {uid: user.id, rid: role.id}, function (d) {
+                $("#user_fenpei_window").window("close");
+                init();
+            });
+        }
+    </script>

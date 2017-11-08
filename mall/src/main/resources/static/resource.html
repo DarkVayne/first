@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/icon.css"/>
+    <link rel="stylesheet" href="css/easyui.css"/>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+    <script src="js/jquery.js"></script>
+    <script src="js/easyui.js"></script>
+    <script>
+        function resourceinit() {
+            $("#resource_grid").datagrid({title:"资源管理",method:get,
+            columns:[[
+                {filed:"text",title:"资源名字"},
+                {filed:"parentid",title:"级别标识"},
+                {filed:"url",title:"路径"}
+            ]],
+                toolbar: [  //定义工具栏
+                    {
+                        "text": "添加", iconCls: "icon-add", handler: function () {
+                        addResource();
+                    }
+                    },//定义按钮
+                    {
+                        "text": "修改", iconCls: "icon-edit", handler: function () {
+                        editResource()
+                    }
+                    },
+                    {
+                        "text": "删除", iconCls: "icon-remove", handler: function () {
+                        deleteResource();
+                    }
+                    }],
+            });
+        }
+
+    </script>
+</head>
+<body>
+<div id="resource_grid"></div>
+</body>
+</html>

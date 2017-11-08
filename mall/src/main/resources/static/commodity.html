@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/icon.css"/>
+    <link rel="stylesheet" href="css/easyui.css"/>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+    <script src="js/jquery.js"></script>
+    <script src="js/easyui.js"></script>
+    <script src="ckeditor/ckeditor.js"></script>
+
+    <script>
+        function commodityinit() {
+            $("#commodity_datagrid").datagrid({
+                url:"findAllCommodity",
+                columns:[[
+                    {field:"sku",title:"编号", checkbox: true},
+                    {field:"commname",title:"名称",width:200},
+                    {field:"price",title:"价格",width:200},
+                    {field:"liangdian",title:"亮点",width:200},
+
+                ]],
+                toolbar:[
+                    {text:"添加",iconCls:"icon-add",handler:function () {
+                        toAddCommodity();
+                    }},
+                    { "text": "修改", iconCls: "icon-edit", handler: function () {
+                        editcommodity();
+                    }},
+                    { "text": "上架", iconCls: "icon-edit", handler: function () {
+                        createHTML();
+                    }}
+                ]
+            })
+            CKEDITOR.replace("comcontent")
+        }
+        $(commodityinit);
+function toAddCommodity() {
+$("#commodity_add_window").window("open");
+}
+function savecommodity() {
+    var data=new FormData(document.getElementById("commodity_add_form"));
+    var ckvalue=CKEDITOR.instances.comcontent.getData();
+data.append("comcontent",ckvalue);
+
+    $.ajax({
+        url:"addCommodity",
+        method:"post",
+        data:data,
+        contentType:false,
+        processData:false,
+        success:function(d){
+            alert(d);
+        }
+   });
+}
+function editcommodity() {
+   var data1= $("#commodity_datagrid").datagrid("getSelected");
+   alert(data1)
+   if (data1){
+       $("commodity_add_form").form("load",{
+           sku:data1.sku,
+          commname: data1.commname,
+           price:data1.price
+       });
+       $("#commodity_add_window").window("open");
+   } else {
+       $.messager.alert("系统提示", "请选择要修改的内容！")
+   }
+
+}
+function createHTML(){
+    var data=$("#commodity_datagrid").datagrid("getSelected");
+    alert(data)
+    $.get( "shangjia",{sku:data.sku},
+       function (d) {
+           $.messager.alert("系统提示","上架完成");
+    });
+        }
+    </script>
+
+</head>
+<body>
+<div id="commodity_datagrid"></div>
+<div id="commodity_add_window" class="easyui-window" style="padding: 50px 50px;width: 500px;height: 500px;display: flex;justify-content: center;flex-flow: column" data-options="title:'添加商品',closed:true,modal:true">
+    <form id="commodity_add_form"   class="form-group">
+
+        <div class="input-group" style="margin-bottom: 20px">
+            <span class="input-group-addon">名称</span>
+            <input type="text" name="commname" class="form-control"/>
+        </div>
+        <div class="input-group" style="margin-bottom: 20px">
+            <span class="input-group-addon">图片</span>
+            <input type="file" name="f1" class="form-control"/>
+        </div>
+        <div class="input-group" style="margin-bottom: 20px">
+            <span class="input-group-addon">价格</span>
+            <input type="text" name="price" class="form-control"/>
+        </div>
+    </form>
+    <textarea name="comcontent" style="height: 800px;width: 80%" rows="3" cols="3"></textarea>
+    <div>
+        <button class="btn btn-success btn-block" onclick="savecommodity()">保存</button>
+    </div>
+
+</body>
+</html>
