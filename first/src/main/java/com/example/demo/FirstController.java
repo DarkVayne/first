@@ -6,7 +6,10 @@ package com.example.demo;
 public class FirstController {
 
 
+public int sum(){
 
+    return 1;
+}
 
 
 }
