@@ -5,7 +5,7 @@ package com.example.demo;
  */
 public class SecondController {
     public int pring(){
-
-        return 1;
+        System.out.println("134");
+             return 1;
     }
 }
