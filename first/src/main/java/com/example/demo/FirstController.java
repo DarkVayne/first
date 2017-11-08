@@ -8,7 +8,7 @@ public class FirstController {
 public String print(){
 
 
-    return "1";
+    return "adg";
 }
 public int sum(){
 
